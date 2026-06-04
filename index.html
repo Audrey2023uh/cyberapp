@@ -4,6 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Executive AI Threat Intelligence Platform</title>
+<script>
+window.DASHBOARD_OFFLINE_FIRST = true;
+window.DASHBOARD_LOCAL_CACHE_URL = "dashboard_api/data/intelligence_cache.json";
+</script>
+<link rel="preload" href="dashboard_api/data/intelligence_cache.json" as="fetch" crossorigin="anonymous">
 <style>
 :root{--red:#8b0000;--navy:#1a2d5a;--navy-pale:#f0f4ff;--gold:#c7900a;--gold-pale:#fffbec;--emerge:#5a1a5a;--border:#d4d4d4;--dark:#111;--ticker-duration:480s}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -298,7 +303,7 @@ a.src{color:#1a3a6b}
   <span class="live-pill offline" id="live-status-pill"><span class="live-dot"></span> CONNECTING</span>
   <span id="live-status-update"><strong>Last Update:</strong> —</span>
   <span id="live-status-sources"><strong>Sources Online:</strong> —</span>
-  <span class="auto-refresh-hint" id="auto-refresh-hint">Auto-refresh: every 5 minutes</span>
+  <span class="auto-refresh-hint" id="auto-refresh-hint">Background updates every 5 minutes</span>
 </div>
 
 <div class="dash-platform" id="intelligence-dashboard">
