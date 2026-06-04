@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en" class="dashboard-live">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Executive AI Threat Intelligence Platform</title>
+<style>
+:root{--red:#8b0000;--navy:#1a2d5a;--navy-pale:#f0f4ff;--gold:#c7900a;--gold-pale:#fffbec;--emerge:#5a1a5a;--border:#d4d4d4;--dark:#111;--ticker-duration:480s}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;width:100%;overflow-x:hidden}
+html.dashboard-live{scroll-behavior:smooth}
+body.dashboard-live{font-family:Georgia,serif;background:#f4f6fb;color:var(--dark);font-size:11pt;line-height:1.85;width:100%}
+body.dashboard-live .page{width:100%;max-width:none;margin:0;padding:0;box-shadow:none;background:#f4f6fb;min-height:100vh}
+body.dashboard-live .dashboard-inner{width:100%;max-width:none;margin:0;padding:0 0 40px}
+body.dashboard-live #executive-cover{width:100vw;max-width:100%;margin-left:calc(50% - 50vw);margin-right:calc(50% - 50vw);border-radius:0;padding:20px clamp(20px,3vw,48px);box-sizing:border-box}
+body.dashboard-live #executive-cover h1{font-size:15pt;margin-bottom:4px}
+body.dashboard-live #executive-cover h2{font-size:9.5pt;margin-bottom:8px}
+body.dashboard-live #executive-cover .cover-bar{margin-bottom:8px}
+body.dashboard-executive #executive-cover{display:block!important;padding:36px clamp(20px,3vw,48px);margin-bottom:0}
+body.dashboard-executive #executive-cover h1{font-size:17pt}
+body.dashboard-executive #executive-cover h2{font-size:10pt;font-weight:600;line-height:1.5}
+body.dashboard-executive #executive-cover .cover-version{display:none}
+body.dashboard-executive #executive-cover .cover-bar{margin-bottom:12px}
+body.dashboard-live .live-status-bar{width:100vw;max-width:100%;margin-left:calc(50% - 50vw);margin-right:calc(50% - 50vw);position:sticky;top:0;z-index:300;border-radius:0;box-sizing:border-box}
+body.dashboard-live .dash-platform{width:100%;max-width:none;margin:0;padding:0 clamp(16px,2.5vw,40px) 24px;box-sizing:border-box}
+body.dashboard-live .intel-ticker-outer{width:100vw;max-width:100%;margin-left:calc(50% - 50vw);margin-right:calc(50% - 50vw);border-radius:0}
+body.dashboard-live .intel-live-summary{border-radius:6px;border-left:none;border-right:none}
+body.dashboard-live .dash-time-range{width:100%;border-radius:8px;box-sizing:border-box}
+body.dashboard-live .dash-sticky-nav{position:sticky;top:48px;z-index:290;background:#f4f6fb;padding:10px 0 8px;margin:0 0 12px;border-bottom:1px solid #c5d0e8;width:100%}
+body.dashboard-live .dash-summary{width:100%}
+body.dashboard-live .charts-grid{width:100%;grid-template-columns:repeat(3,1fr)}
+body.dashboard-live table.bix{width:100%}
+body.dashboard-live .gov-source-grid{width:100%}
+body.dashboard-live .gov-threat-grid{width:100%}
+body.dashboard-live a[href^="#"]{scroll-margin-top:100px}
+body.dashboard-live .launch-box{display:none}
+body.dashboard-live.file-protocol .launch-box{display:block;margin:16px clamp(16px,2.5vw,40px)}
+@media(max-width:1100px){body.dashboard-live .charts-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:700px){body.dashboard-live .charts-grid{grid-template-columns:1fr}}
+.launch-box{background:var(--navy-pale);border:2px solid var(--navy);border-radius:8px;padding:18px 22px;margin:0 0 24px;font-family:sans-serif;font-size:9.5pt;line-height:1.65}
+.launch-box h2{font-size:12pt;color:var(--navy);margin:0 0 10px}
+.launch-box ol{margin:8px 0 0 20px}
+.launch-box code{background:#e8ecf5;padding:2px 6px;border-radius:3px}
+.launch-box a{color:var(--navy);font-weight:700}
+.dash-platform{margin:0 0 24px;padding:0 0 20px;border-bottom:3px solid var(--navy)}
+.dash-title{font-size:18pt;color:var(--navy);font-family:sans-serif;margin:0 0 6px}
+.dash-sub{font-size:9.5pt;color:#555;margin-bottom:12px}
+.dash-toolbar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;padding:12px 16px;background:var(--navy-pale);border:1px solid #c5d0e8;border-radius:6px;margin-bottom:20px;font-family:sans-serif;font-size:9pt}
+.dash-toolbar button{background:var(--red);color:#fff;border:none;padding:8px 16px;border-radius:4px;font-weight:700;cursor:pointer;font-size:9pt}
+.dash-toolbar button.btn-navy{background:var(--navy)}
+.dash-toolbar button:hover{filter:brightness(1.08)}
+#sync-status{flex:1;min-width:200px;color:#444;font-size:9pt;line-height:1.5}
+.api-connect-banner{display:none;margin:0 0 16px;padding:12px 16px;border-radius:6px;font-size:9pt;font-family:sans-serif;line-height:1.55}
+.api-connect-banner.error{background:#fde8e8;border:1px solid #c0392b;color:#5a1a1a}
+.api-connect-banner.ok{background:#eef8ee;border:1px solid #27ae60;color:#1e4d2b}
+.dash-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:0 0 16px}
+@media(max-width:900px){.dash-summary{grid-template-columns:repeat(2,1fr)}}
+.dash-stat{background:#fff;border:1px solid var(--border);border-radius:6px;padding:14px 16px}
+.dash-stat.clickable{cursor:pointer;transition:box-shadow .15s,border-color .15s}
+.dash-stat.clickable:hover{border-color:var(--navy);box-shadow:0 2px 8px rgba(26,45,90,.15)}
+.dash-stat.clickable:focus{outline:2px solid var(--gold);outline-offset:2px}
+.dash-stat .ds-hint{font-size:7pt;color:#888;margin-top:6px;font-family:sans-serif}
+.dash-stat .ds-label{font-size:7.5pt;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#888;font-family:sans-serif}
+.stat-detail-panel{display:none;margin:0 0 20px;padding:16px 18px;background:#fff;border:2px solid var(--navy);border-radius:8px;font-family:sans-serif;font-size:9pt}
+.stat-detail-panel.open{display:block}
+.stat-detail-panel h3{font-size:11pt;color:var(--navy);margin:0 0 10px}
+.stat-detail-panel .close-detail{float:right;background:var(--navy);color:#fff;border:none;padding:4px 10px;border-radius:4px;cursor:pointer;font-size:8pt}
+.stat-detail-panel ul{margin:8px 0 0 18px;line-height:1.7}
+.stat-detail-panel li a{color:var(--navy);font-weight:700}
+.stat-drill-row{cursor:pointer;background:#f8faff!important}
+.stat-drill-row:hover td{color:var(--navy)}
+.stat-drill-row strong{color:var(--red)}
+.dash-stat .ds-value{font-size:16pt;font-weight:800;color:var(--navy);font-family:sans-serif;margin-top:4px}
+.dash-stat .ds-sub{font-size:8pt;color:#666;margin-top:4px}
+.dash-stat.warn{border-left:4px solid var(--gold);background:var(--gold-pale)}
+.source-status-panel{display:none;margin:0 0 20px;padding:16px 18px;background:#fff;border:1px solid var(--border);border-radius:6px}
+.source-status-panel.open{display:block}
+.intel-ticker-outer{background:linear-gradient(90deg,#0d0d1a,var(--navy));color:#fff;border-radius:6px 6px 0 0;overflow:hidden}
+.intel-ticker-label{background:#0d0d1a;font-size:7.5pt;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;padding:6px 14px;font-family:sans-serif;color:#e8ecf5}
+.intel-ticker-viewport{overflow:hidden;padding:8px 0 10px}
+.intel-ticker-track{display:flex;gap:28px;white-space:nowrap;animation:ticker-scroll var(--ticker-duration) linear infinite;width:max-content}
+.intel-ticker-track:hover{animation-play-state:paused}
+@media (prefers-reduced-motion:reduce){.intel-ticker-track{animation:none}}
+@keyframes ticker-scroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+a.ticker-item{color:#fff!important;text-decoration:none;font-size:9pt;font-family:sans-serif;padding:4px 12px;border-radius:4px;border:1px solid rgba(255,255,255,.2);display:inline-flex;align-items:center;gap:8px;background:rgba(0,0,0,.2)}
+a.ticker-item:hover{background:rgba(255,255,255,.15);color:#fff!important}
+a.ticker-item:visited{color:#fff!important}
+a.ticker-item .tk-sev{font-weight:800}
+a.ticker-item.sev-crit .tk-sev{color:#ff8a8a}
+a.ticker-item.sev-high .tk-sev{color:#ffb347}
+a.ticker-item.sev-med .tk-sev{color:#ffe566}
+a.ticker-item .tk-src{color:#e8ecf5;opacity:1}
+a.ticker-item .tk-date{color:#d0d8e8;font-size:8pt}
+a.ticker-item .tk-title{color:#fff;font-weight:600;max-width:420px;overflow:hidden;text-overflow:ellipsis}
+.intel-ticker-empty{padding:12px 18px;font-size:9pt;color:#e8ecf5;font-style:italic}
+.intel-live-summary{background:var(--navy-pale);border:1px solid #c5d0e8;border-top:none;padding:12px 18px;margin:0 0 20px;border-radius:0 0 6px 6px;font-size:9pt;font-family:sans-serif}
+.dash-nav{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 18px}
+.dash-nav a{font-size:8.5pt;padding:4px 10px;background:var(--navy);color:#fff;border-radius:12px;text-decoration:none;font-family:sans-serif}
+h2.sec.dash-sec{font-size:13.5pt;font-weight:bold;color:var(--red);border-bottom:2.5px solid var(--red);padding-bottom:7px;margin:28px 0 14px;font-family:sans-serif;text-transform:uppercase}
+.incident-recent-banner{background:var(--navy-pale);border-left:4px solid var(--navy);padding:10px 14px;margin:0 0 12px;font-size:9pt}
+.incident-filters{display:flex;flex-wrap:wrap;gap:12px 16px;align-items:center;margin:12px 0;font-size:9pt;font-family:sans-serif}
+.period-btn-group{display:flex;flex-wrap:wrap;gap:6px}
+.period-btn{background:#fff;border:2px solid var(--navy);color:var(--navy);padding:6px 12px;border-radius:4px;font-size:9pt;font-weight:700;cursor:pointer;font-family:sans-serif}
+.period-btn:hover{background:var(--navy-pale)}
+.period-btn.active{background:var(--navy);color:#fff}
+.period-btn:focus{outline:2px solid var(--gold);outline-offset:2px}
+.dash-time-range{background:var(--navy-pale);border:2px solid var(--navy);border-radius:8px;padding:14px 18px;margin:0 0 18px;font-family:sans-serif;font-size:9pt}
+.dash-time-range h2.time-range-title{font-size:11pt;color:var(--navy);margin:0 0 12px;font-weight:800}
+.dash-time-range .time-range-row{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;margin-bottom:10px}
+.dash-time-range label{font-weight:600;color:#333}
+.dash-time-range input[type=date]{padding:6px 8px;border:1px solid var(--border);border-radius:4px;font-size:9pt;margin-left:6px}
+.dash-time-range select{padding:6px 8px;border:1px solid var(--border);border-radius:4px;font-size:9pt;margin-left:6px}
+.dash-time-range #btn-apply-range{background:var(--navy);color:#fff;border:none;padding:8px 16px;border-radius:4px;font-weight:700;cursor:pointer;font-size:9pt}
+.dash-time-range #btn-apply-range:hover{filter:brightness(1.08)}
+#time-range-display{font-size:8.5pt;color:#444;margin:8px 0 0;font-weight:600}
+.period-btn.custom-active{background:var(--gold);color:#111;border-color:var(--gold)}
+.wiz-panel{border:1px solid var(--border);padding:14px 16px;margin:12px 0;background:#fafafa;border-radius:6px;font-size:9pt}
+.sector-hint{font-size:8.5pt;color:#555;margin:6px 0 0;line-height:1.5}
+#sector-filter-note{font-weight:700;color:var(--navy)}
+table.bix{width:100%;border-collapse:collapse;font-size:8.5pt;margin:14px 0}
+table.bix thead tr{background:var(--navy);color:#fff}
+table.bix thead th{padding:8px 7px;text-align:left;font-family:sans-serif;font-size:8pt}
+table.bix tbody td{padding:7px 8px;border:1px solid #ddd;vertical-align:top}
+.hist-badge{display:inline-block;font-size:7pt;font-weight:800;background:#5a4a6a;color:#fff;padding:2px 8px;border-radius:10px;margin-left:6px;font-family:sans-serif}
+.historical-panel{margin-top:16px;border:1px solid var(--border);border-radius:6px;background:#fafafa}
+.historical-panel>summary{cursor:pointer;padding:12px 16px;font-weight:800;color:var(--emerge);font-family:sans-serif}
+.wiz-checks{display:flex;flex-wrap:wrap;gap:8px 14px;margin:8px 0}
+.wiz-threat-row{cursor:pointer}
+.wiz-threat-row:hover td{background:#f8faff!important}
+.wiz-threat-row .wiz-src-link{color:var(--navy);font-weight:700;font-size:8pt;white-space:nowrap}
+a.src{color:#1a3a6b}
+.pri-crit,.pri-high,.pri-med,.pri-low{font-size:7.5pt;font-weight:700;padding:2px 8px;border-radius:10px;color:#fff;font-family:sans-serif}
+.pri-crit{background:#c0392b}.pri-high{background:#e67e22}.pri-med{background:#d4ac0d}.pri-low{background:#27ae60}
+.cache-warn{color:#a05000;font-weight:700}
+.status-online{color:#1e6b3a;font-weight:700}.status-offline{color:#c0392b;font-weight:700}
+.fin-none{font-size:8pt;color:#666;font-style:italic}
+.fin-verified{color:#1e6b3a;font-weight:700;font-size:8pt}
+.fin-bar-wrap{display:flex;align-items:center;gap:8px;min-width:140px}
+.fin-bar{flex:1;height:8px;background:#e8ecf5;border-radius:4px;overflow:hidden}
+.fin-bar-fill{display:block;height:100%;border-radius:4px}
+.fin-bar-fill.fin-crit{background:linear-gradient(90deg,#c0392b,#8b0000)}
+.fin-bar-fill.fin-high{background:linear-gradient(90deg,#e67e22,#c0392b)}
+.fin-bar-fill.fin-med{background:linear-gradient(90deg,#d4ac0d,#e67e22)}
+.fin-bar-fill.fin-low{background:linear-gradient(90deg,#27ae60,#2ecc71)}
+.fin-band{font-size:7.5pt;font-weight:700;color:#333;white-space:nowrap}
+.corpus-pill{display:inline-block;font-size:7pt;font-weight:700;padding:2px 7px;border-radius:10px;background:var(--navy-pale);color:var(--navy);border:1px solid #c5d0e8}
+.date-rel{display:block;font-size:7.5pt;color:#666;font-weight:600}
+.date-abs{font-weight:700}
+.gov-us-banner{background:linear-gradient(135deg,#0d1a33,#1a2d5a);color:#fff;padding:14px 18px;border-radius:8px;margin:0 0 18px;font-family:sans-serif;font-size:9pt;line-height:1.6}
+.gov-us-banner strong{color:#fff}
+.gov-source-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;margin:12px 0 20px}
+.gov-source-card{display:block;padding:12px 14px;background:#fff;border:2px solid var(--navy);border-radius:8px;text-decoration:none;color:var(--navy);font-family:sans-serif;font-size:8.5pt;line-height:1.5;transition:box-shadow .15s}
+.gov-source-card:hover{box-shadow:0 4px 12px rgba(26,45,90,.2)}
+.gov-source-card .gsc-agency{font-size:7pt;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:#666}
+.gov-source-card .gsc-title{font-size:9.5pt;font-weight:800;color:var(--navy);margin:4px 0}
+.gov-threat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;margin:14px 0 24px}
+.gov-threat-card{border:2px solid var(--border);border-left:5px solid var(--navy);border-radius:8px;padding:14px 16px;background:#fff;font-size:8.5pt}
+.gov-threat-card.crit{border-left-color:#c0392b}
+.gov-threat-card h4{font-size:10pt;color:var(--navy);margin:0 0 8px;font-family:sans-serif}
+.gov-decision-steps{margin:8px 0 0;padding-left:18px;line-height:1.65}
+.gov-decision-steps li{margin:4px 0}
+.gov-action-card{border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin:0 0 12px;background:var(--navy-pale)}
+.gov-action-card h4{font-size:10pt;color:var(--navy);margin:0 0 6px;font-family:sans-serif}
+.gov-meta-row{display:flex;flex-wrap:wrap;gap:8px 14px;margin:6px 0;font-size:8pt;color:#444}
+.gov-tag{display:inline-block;padding:3px 8px;border-radius:12px;background:#fff;border:1px solid #c5d0e8;font-weight:700;font-size:7.5pt}
+.gov-jump{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 16px;font-family:sans-serif;font-size:8.5pt}
+.gov-jump a{padding:6px 12px;background:var(--navy);color:#fff;border-radius:16px;text-decoration:none;font-weight:700}
+.gov-jump a:hover{filter:brightness(1.1)}
+.cover{padding:40px 36px 36px;background:linear-gradient(135deg,#0d0d1a 0%,#1a2d5a 45%,#8b0000 100%);color:#fff;margin:0 0 0;position:relative;overflow:hidden;border-radius:6px 6px 0 0}
+.cover::after{content:'';position:absolute;top:-80px;right:-80px;width:300px;height:300px;border-radius:50%;background:rgba(255,255,255,.04)}
+.cover-top-row{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:12px;position:relative;z-index:1}
+.cover-label{font-size:8pt;letter-spacing:2.5px;text-transform:uppercase;color:#9ab;font-family:sans-serif;flex:1}
+.cover-version{text-align:right;font-size:8pt;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:#fff;font-family:sans-serif;line-height:1.5;background:rgba(0,0,0,.35);padding:8px 12px;border-radius:4px;border:1px solid rgba(255,255,255,.2)}
+.cover h1{font-size:17pt;font-weight:bold;line-height:1.28;margin-bottom:10px;position:relative;z-index:1}
+.cover h1 em{color:#e87070;font-style:normal}
+.cover h2{font-size:10.5pt;color:#e8ecf5;line-height:1.55;font-weight:600;margin-bottom:16px;position:relative;z-index:1}
+.cover-bar{width:70px;height:4px;background:linear-gradient(90deg,#e87070,#8888ee);margin-bottom:14px;border-radius:2px}
+.cover-meta{font-size:9pt;color:#ccd6ea;line-height:1.9;font-family:sans-serif;position:relative;z-index:1}
+.cover-meta strong{color:#fff}
+.cover-tags{margin-top:12px;position:relative;z-index:1}
+.ctag-ref{padding:5px 12px;border-radius:20px;font-size:7.5pt;font-family:sans-serif;font-weight:600;background:rgba(26,45,90,.65);color:#c5d8f0;border:1px solid rgba(80,120,200,.4)}
+.live-status-bar{display:flex;flex-wrap:wrap;align-items:center;gap:14px 22px;padding:12px 18px;background:#0d1a33;color:#e8ecf5;font-family:sans-serif;font-size:9pt;border-bottom:3px solid var(--gold)}
+.live-pill{display:inline-flex;align-items:center;gap:6px;font-weight:800;font-size:9pt;padding:4px 12px;border-radius:20px;background:rgba(39,174,96,.25);color:#7dffb0;border:1px solid #27ae60}
+.live-pill.offline{background:rgba(192,57,43,.2);color:#ffb0b0;border-color:#c0392b}
+.live-pill .live-dot{width:8px;height:8px;border-radius:50%;background:#2ecc71;animation:live-pulse 2s ease-in-out infinite}
+.live-pill.offline .live-dot{background:#e74c3c;animation:none}
+@keyframes live-pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.new-items-banner{display:none;margin:0 0 16px;padding:14px 18px;background:linear-gradient(90deg,#fff5e6,#fffbec);border:2px solid var(--gold);border-radius:8px;font-family:sans-serif;font-size:10pt;font-weight:700;color:#7a5500}
+.new-items-banner.visible{display:block}
+.new-items-banner .nb-fire{margin-right:6px}
+.charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:20px 0 24px}
+@media(max-width:800px){.charts-grid{grid-template-columns:1fr}}
+.chart-card{border:1px solid var(--border);border-radius:8px;padding:14px 16px;background:#fff}
+.chart-card h3{font-size:9.5pt;color:var(--navy);margin:0 0 10px;font-family:sans-serif;text-transform:uppercase;letter-spacing:.5px}
+.chart-card.wide{grid-column:1/-1}
+.chart-wrap{position:relative;height:220px}
+.auto-refresh-hint{font-size:8pt;color:#9ab;opacity:.9}
+.exec-priority-banner{background:var(--gold-pale);border:2px solid var(--gold);border-radius:8px;padding:12px 16px;margin:0 0 20px;font-family:sans-serif;font-size:9.5pt;line-height:1.55}
+.exec-priority-banner strong{color:var(--navy)}
+.exec-decision-list{display:flex;flex-direction:column;gap:14px;margin:0 0 8px}
+.exec-decision-card{background:#fff;border:2px solid var(--navy);border-radius:8px;padding:16px 18px;font-family:sans-serif;font-size:9pt;line-height:1.6}
+.exec-decision-head{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;margin:0 0 12px}
+.exec-decision-num{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:var(--navy);color:#fff;font-weight:800;font-size:10pt}
+.exec-decision-head h3{flex:1;min-width:200px;font-size:11pt;color:var(--navy);margin:0}
+.exec-decision-dl{margin:0}
+.exec-decision-dl>div{margin:0 0 10px;padding:0 0 10px;border-bottom:1px solid #e8ecf5}
+.exec-decision-dl>div:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.exec-decision-dl dt{font-size:7.5pt;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:#666;margin:0 0 4px}
+.exec-decision-dl dd{margin:0;color:#222}
+.exec-threat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin:8px 0 4px}
+.exec-threat-card{background:#fff;border:2px solid var(--border);border-left:5px solid var(--red);border-radius:8px;padding:14px 16px;font-family:sans-serif;font-size:9pt}
+.exec-threat-source-row{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:baseline;margin:0 0 6px}
+.exec-threat-source-label{font-size:7pt;font-weight:800;text-transform:uppercase;color:#888;letter-spacing:.6px}
+.exec-threat-source-name{font-size:10pt;color:var(--navy)}
+.exec-threat-date{font-size:8.5pt;color:#555;margin:0 0 8px;font-weight:600}
+.exec-threat-title{font-size:10.5pt;line-height:1.45;margin:0 0 10px}
+.exec-threat-title a{font-weight:700}
+.exec-threat-foot{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;justify-content:space-between}
+.exec-threat-open{font-size:8.5pt;font-weight:700;white-space:nowrap}
+.exec-row-control{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;margin:0 0 12px;padding:12px 14px;background:var(--navy-pale);border:1px solid #c5d0e8;border-radius:6px;font-family:sans-serif;font-size:9pt}
+.exec-limit-btn{background:#fff;border:2px solid var(--navy);color:var(--navy);padding:6px 14px;border-radius:4px;font-size:9pt;font-weight:700;cursor:pointer;font-family:sans-serif}
+.exec-limit-btn.active{background:var(--navy);color:#fff}
+.exec-table-bundle{margin:16px 0;border:1px solid var(--border);border-radius:8px;background:#fafafa}
+.exec-table-bundle>summary{cursor:pointer;padding:12px 16px;font-weight:800;color:var(--navy);font-family:sans-serif;font-size:10pt}
+.exec-table-bundle .bundle-inner{padding:0 16px 16px}
+</style>
+<script>
+(function () {
+  var prod = /(?:^|[?&])production=1(?:&|$)/.test(location.search);
+  var priority = /(?:^|[?&])priority=1(?:&|$)/.test(location.search);
+  function addScript(src) {
+    var s = document.createElement("script");
+    s.src = src;
+    s.defer = true;
+    document.head.appendChild(s);
+  }
+  addScript("https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js");
+  if (priority) {
+    addScript("ai_threat_dashboard_fixed.js");
+    addScript("ai_threat_dashboard_executive_priority.js");
+  } else if (prod) {
+    addScript("ai_threat_dashboard_production.js");
+    addScript("ai_threat_dashboard_production_launcher.js");
+    addScript("ai_threat_dashboard_fixed.js");
+    addScript("ai_threat_dashboard_executive_enrichment.js");
+    addScript("ai_threat_dashboard_governance_platform.js");
+    addScript("ai_threat_dashboard_decision_support.js");
+  } else {
+    addScript("ai_threat_dashboard_fixed.js");
+    addScript("ai_threat_dashboard_executive_enrichment.js");
+    addScript("ai_threat_dashboard_executive.js");
+  }
+})();
+</script>
+</head>
+<body class="dashboard-live">
+<script>
+(function () {
+  var prod = /(?:^|[?&])production=1(?:&|$)/.test(location.search);
+  var priority = /(?:^|[?&])priority=1(?:&|$)/.test(location.search);
+  var b = document.body;
+  if (priority) {
+    b.className = "dashboard-live executive-priority-view";
+    b.dataset.dashboardVariant = "executive-priority";
+  } else if (prod) {
+    b.className = "dashboard-live dashboard-governance dashboard-production";
+    b.dataset.dashboardVariant = "governance-production";
+  } else {
+    b.className = "dashboard-live dashboard-executive";
+    b.dataset.dashboardVariant = "executive";
+  }
+})();
+</script>
+<div class="page">
+<div class="dashboard-inner">
+
+<div class="cover" id="executive-cover">
+  <div class="cover-top-row">
+    <div class="cover-label">Executive Briefing · 2026</div>
+  </div>
+  <h1>Executive AI Threat Intelligence Platform</h1>
+  <h2>Evidence-Based Threat Prioritization and Decision Support<br>for Executives, CISOs, and Risk Leaders</h2>
+  <div class="cover-bar"></div>
+  <div class="cover-meta">
+    <strong>Audrey Rah</strong> · University of Houston<br>
+    All citations link to authoritative public sources.<br>
+    No invented financial figures.
+  </div>
+  <div class="cover-tags"><span class="ctag-ref">NIST · CISA · NSA · FBI · MITRE · OWASP · ENISA</span></div>
+</div>
+
+<div class="launch-box" id="launch-box">
+  <h2>Live intelligence unavailable</h2>
+  <p>Open this dashboard through your organization&apos;s approved executive intelligence link, then use <strong>Refresh Intelligence</strong>.</p>
+</div>
+
+<div class="live-status-bar" id="live-status-bar" role="status">
+  <span class="live-pill offline" id="live-status-pill"><span class="live-dot"></span> CONNECTING</span>
+  <span id="live-status-update"><strong>Last Update:</strong> —</span>
+  <span id="live-status-sources"><strong>Sources Online:</strong> —</span>
+  <span class="auto-refresh-hint" id="auto-refresh-hint">Auto-refresh: every 5 minutes</span>
+</div>
+
+<div class="dash-platform" id="intelligence-dashboard">
+
+  <section id="exec-primary-zone" class="exec-primary-zone" aria-label="Executive priorities">
+  <div class="exec-priority-banner" role="note">
+    <strong>Decision first</strong> — Top threat, why it matters, who is affected, action, and references before supporting data.
+  </div>
+
+  <div id="exec-top-threat-hero" class="exec-top-hero-mount" aria-live="polite">
+    <p class="fin-none" style="font-size:9pt">Loading top threat…</p>
+  </div>
+
+  <h2 class="sec dash-sec" id="exec-decision-items" style="margin-top:12px">Executive Decision Items</h2>
+  <p class="dash-sub" style="margin-top:-6px">Governance actions with evidence-linked Why · Who · Action · References.</p>
+  <div id="exec-decision-items-body" class="exec-decision-list" aria-live="polite">
+    <p class="fin-none" style="font-family:sans-serif;font-size:9pt">Loading executive decision items…</p>
+  </div>
+
+  <div class="dash-toolbar exec-toolbar-top">
+    <button type="button" id="btn-refresh" title="Reload latest verified intelligence">↻ Refresh Intelligence</button>
+    <button type="button" id="btn-source-status" class="btn-navy">Source Status</button>
+    <span id="sync-status">Loading…</span>
+  </div>
+  </section>
+
+  <details class="exec-secondary-bundle" id="exec-secondary">
+    <summary>Supporting intelligence (feeds, charts, statistics, tables)</summary>
+    <div class="exec-secondary-inner">
+
+  <h2 class="sec dash-sec" id="daily-threats-today" style="margin-top:0">Emerging AI Threats &amp; Intelligence</h2>
+  <p class="dash-sub" id="daily-threats-sub" style="margin-top:-6px">Loading…</p>
+  <div id="daily-threats-body" aria-live="polite">
+    <p class="fin-none" style="font-family:sans-serif;font-size:9pt">Loading latest threats…</p>
+  </div>
+
+  <div class="exec-row-control" role="group" aria-label="How many table rows to show">
+    <strong>Table detail (optional):</strong>
+    <span>Show</span>
+    <button type="button" class="exec-limit-btn active" data-limit="5">5</button>
+    <button type="button" class="exec-limit-btn" data-limit="10">10</button>
+    <button type="button" class="exec-limit-btn" data-limit="20">20</button>
+    <button type="button" class="exec-limit-btn" data-limit="all">All</button>
+    <span>items per table when you expand a section below.</span>
+  </div>
+  <p id="exec-row-limit-hint" class="dash-sub" style="margin:-4px 0 16px;font-size:8.5pt">Default: 5 rows. Large tables stay collapsed until you open them.</p>
+
+  <div class="intel-ticker-outer">
+    <div class="intel-ticker-label">Live Intelligence Ticker · Authoritative Sources</div>
+    <div class="intel-ticker-viewport">
+      <div class="intel-ticker-track" id="intel-ticker-track"><span class="intel-ticker-empty">Loading…</span></div>
+    </div>
+  </div>
+  <div class="intel-live-summary" id="intel-live-summary">
+    <h3 style="font-size:9.5pt;color:var(--navy);margin:0 0 8px;font-family:sans-serif">Live Intelligence Summary</h3>
+    <div class="ils-grid" id="intel-live-summary-body"><div>Loading…</div></div>
+  </div>
+
+  <div class="dash-time-range" id="dash-time-range" role="region" aria-label="Time range and ticker speed">
+    <h2 class="time-range-title">Time range · select dates, then Apply</h2>
+    <div class="time-range-row" role="group" aria-label="Quick period">
+      <strong>Quick:</strong>
+      <div class="period-btn-group period-btn-group-top">
+        <button type="button" class="period-btn period-btn-top" data-period="7d">Last 7 Days</button>
+        <button type="button" class="period-btn period-btn-top" data-period="14d">Last 2 Weeks</button>
+        <button type="button" class="period-btn period-btn-top" data-period="30d">Last 30 Days</button>
+        <button type="button" class="period-btn period-btn-top" data-period="90d">Last 90 Days</button>
+        <button type="button" class="period-btn period-btn-top active" data-period="12m">Last 12 Months</button>
+        <button type="button" class="period-btn period-btn-top" data-period="all">All Time</button>
+      </div>
+    </div>
+    <div class="time-range-row">
+      <label for="date-from">From</label>
+      <input type="date" id="date-from" aria-label="Start date">
+      <label for="date-to">To</label>
+      <input type="date" id="date-to" aria-label="End date">
+      <button type="button" id="btn-apply-range">Apply range</button>
+    </div>
+    <div class="time-range-row">
+      <label for="ticker-speed">Ticker speed</label>
+      <select id="ticker-speed" aria-label="Ticker scroll speed">
+        <option value="720">Very slow (12 min)</option>
+        <option value="480" selected>Slow (8 min)</option>
+        <option value="300">Medium (5 min)</option>
+      </select>
+    </div>
+    <p id="time-range-display">Showing: Last 12 Months</p>
+  </div>
+
+  <h1 class="dash-title">Supporting Intelligence</h1>
+  <p class="dash-sub">Charts, statistics, and detailed tables · <strong>Last update:</strong> <span id="dash-last-update">—</span></p>
+
+  <div id="api-connect-banner" class="api-connect-banner error" role="status"></div>
+  <div class="new-items-banner" id="new-items-banner" role="status"></div>
+
+  <p class="dash-sub" style="margin:-8px 0 14px;font-size:8.5pt"><strong>Tip:</strong> Click any statistic to open authoritative source links.</p>
+
+  <div class="dash-summary">
+    <div class="dash-stat clickable" role="button" tabindex="0" data-stat-key="sources-online" aria-label="Sources online — click for links">
+      <div class="ds-label">Sources Online</div><div class="ds-value" id="stat-sources-online">—</div><div class="ds-sub" id="stat-sources-online-sub">of — sources</div><div class="ds-hint">Click for source URLs</div>
+    </div>
+    <div class="dash-stat clickable" role="button" tabindex="0" data-stat-key="sources-offline" aria-label="Sources offline — click for links">
+      <div class="ds-label">Sources Offline</div><div class="ds-value" id="stat-sources-offline">—</div><div class="ds-sub" id="stat-sources-offline-sub">of — sources</div><div class="ds-hint">Click for source URLs</div>
+    </div>
+    <div class="dash-stat clickable" role="button" tabindex="0" data-stat-key="feed-items" aria-label="Feed items — click for links">
+      <div class="ds-label">Feed Items</div><div class="ds-value" id="stat-feed-items">—</div><div class="ds-sub">Live + cache</div><div class="ds-hint">Click for feed links</div>
+    </div>
+    <div class="dash-stat clickable" role="button" tabindex="0" data-stat-key="recent-incidents" aria-label="Recent incidents — click for links">
+      <div class="ds-label">Recent Incidents</div><div class="ds-value" id="stat-recent-inc">—</div><div class="ds-sub" id="stat-recent-inc-sub">Last 12 Months window</div><div class="ds-hint">Click for incident refs</div>
+    </div>
+  </div>
+  <div class="dash-summary" style="margin-top:-8px">
+    <div class="dash-stat clickable" role="button" tabindex="0" data-stat-key="historical-incidents" aria-label="Historical incidents — click for links">
+      <div class="ds-label">Historical Incidents</div><div class="ds-value" id="stat-hist-inc">—</div><div class="ds-sub">Reference corpus</div><div class="ds-hint">Click for incident refs</div>
+    </div>
+    <div class="dash-stat clickable" role="button" tabindex="0" data-stat-key="new-items" aria-label="New items — click for links">
+      <div class="ds-label">New Items</div><div class="ds-value" id="stat-new-items">—</div><div class="ds-sub">Since refresh</div><div class="ds-hint">Click for what was new</div>
+    </div>
+    <div class="dash-stat warn clickable" id="stat-cache-card" style="display:none" role="button" tabindex="0" data-stat-key="cache" aria-label="Cache status — click for links">
+      <div class="ds-label">Cache</div><div class="ds-value cache-warn">⚠ Cached</div><div class="ds-sub" id="stat-cache-sub"></div><div class="ds-hint">Click for offline sources</div>
+    </div>
+  </div>
+
+  <div id="stat-detail-panel" class="stat-detail-panel" aria-live="polite">
+    <button type="button" class="close-detail" id="stat-detail-close">Close</button>
+    <h3 id="stat-detail-title">Source links</h3>
+    <div id="stat-detail-body"></div>
+  </div>
+
+  <div class="source-status-panel" id="source-status-panel">
+    <h3 style="font-family:sans-serif;color:var(--navy)">Source Status</h3>
+    <table class="bix"><thead><tr><th>Source</th><th>Status</th><th>Last Sync</th><th>Items</th></tr></thead>
+    <tbody id="source-status-tbody"><tr><td colspan="4">Loading…</td></tr></tbody></table>
+  </div>
+
+  <nav class="dash-nav dash-sticky-nav" aria-label="Dashboard sections">
+    <a href="#exec-top-threat-hero">Top threat</a>
+    <a href="#exec-decision-items">Decisions</a>
+    <a href="#exec-secondary">Supporting</a>
+    <a href="#daily-threats-today">Feeds</a>
+    <a href="#exec-charts">Charts</a>
+    <a href="#incident-recent">Incidents</a>
+    <a href="#intel-feed">Feed</a>
+    <a href="#threat-trends">Trends</a>
+    <a href="#org-wizard">My Organization</a>
+    <a href="#awareness-center">Governance</a>
+  </nav>
+
+  <h2 class="sec dash-sec" id="exec-charts">Executive Analytics</h2>
+  <p id="chart-source-note" style="font-size:8.5pt;color:#555;margin:0 0 12px;font-family:sans-serif"></p>
+  <div class="charts-grid">
+    <div class="chart-card wide">
+      <h3>Threat trend — counts from source-linked corpus</h3>
+      <div class="chart-wrap"><canvas id="chart-threat-trend" aria-label="Threat trend line chart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <h3>Activity by week (last 12 weeks)</h3>
+      <div class="chart-wrap"><canvas id="chart-incidents-week" aria-label="Incidents and feed by week"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <h3>Activity by month (last 18 months)</h3>
+      <div class="chart-wrap"><canvas id="chart-incidents-month" aria-label="Incidents and feed by month"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <h3>Top threat categories (incident-linked)</h3>
+      <div class="chart-wrap"><canvas id="chart-top-threats" aria-label="Top threat categories"></canvas></div>
+    </div>
+  </div>
+
+  <h2 class="sec dash-sec" id="incident-recent-heading">Recent AI Incidents (Last 12 Months)</h2>
+  <div class="incident-recent-banner"><strong>Click a period button</strong> — each click reloads data from the API for that time window.</div>
+
+  <div class="wiz-panel">
+    <div class="incident-filters" role="group" aria-label="Incident filters">
+      <strong>Period:</strong>
+      <div class="period-btn-group" role="group" aria-label="Incident time period">
+        <button type="button" class="period-btn" data-period="7d" aria-pressed="false">Last 7 Days</button>
+        <button type="button" class="period-btn" data-period="14d" aria-pressed="false">Last 2 Weeks</button>
+        <button type="button" class="period-btn" data-period="30d" aria-pressed="false">Last 30 Days</button>
+        <button type="button" class="period-btn" data-period="90d" aria-pressed="false">Last 90 Days</button>
+        <button type="button" class="period-btn active" data-period="12m" aria-pressed="true">Last 12 Months</button>
+        <button type="button" class="period-btn" data-period="all" aria-pressed="false">All Time</button>
+      </div>
+      <span style="display:none">
+        <label><input type="radio" name="incident-period" value="7d">7d</label>
+        <label><input type="radio" name="incident-period" value="14d">14d</label>
+        <label><input type="radio" name="incident-period" value="30d">30d</label>
+        <label><input type="radio" name="incident-period" value="90d">90d</label>
+        <label><input type="radio" name="incident-period" value="12m" checked>12m</label>
+        <label><input type="radio" name="incident-period" value="all">all</label>
+      </span>
+    </div>
+    <label style="display:block;margin-top:10px">Search <input type="search" id="incident-search" placeholder="Company, threat, organization…" style="width:280px;padding:6px;margin-left:6px"></label>
+  </div>
+
+  <details class="exec-table-bundle" id="bundle-incidents">
+    <summary>Recent incidents — detailed table (optional)</summary>
+    <div class="bundle-inner">
+  <table class="bix" id="incident-recent">
+    <thead><tr><th>Organization</th><th>Sector</th><th>Date</th><th>Threat</th><th>Financial impact (reported)</th><th>Impact</th><th>Reference</th></tr></thead>
+    <tbody id="incident-recent-tbody"><tr><td colspan="7">Loading…</td></tr></tbody>
+  </table>
+    </div>
+  </details>
+
+  <details class="historical-panel">
+    <summary>Historical Examples (older than 12 months)</summary>
+    <div style="padding:12px 16px">
+      <table class="bix">
+        <thead><tr><th>Organization</th><th>Sector</th><th>Date</th><th>Threat</th><th>Financial impact (reported)</th><th>Impact</th><th>Reference</th></tr></thead>
+        <tbody id="incident-historical-tbody"><tr><td colspan="7">Loading…</td></tr></tbody>
+      </table>
+    </div>
+  </details>
+
+  <h2 class="sec dash-sec" id="intel-feed">AI Threat Intelligence Feed</h2>
+  <details class="exec-table-bundle" id="bundle-feed">
+    <summary>Intelligence feed — detailed table (optional)</summary>
+    <div class="bundle-inner">
+  <table class="bix">
+    <thead><tr><th>Item</th><th>Source</th><th>Date</th><th>Severity</th></tr></thead>
+    <tbody id="feed-tbody"><tr><td colspan="4">Loading…</td></tr></tbody>
+  </table>
+    </div>
+  </details>
+
+  <h2 class="sec dash-sec" id="threat-trends">Threat Trend Dashboard</h2>
+  <p id="trend-note" style="font-size:9pt;margin-bottom:10px"></p>
+  <details class="exec-table-bundle" id="bundle-trends">
+    <summary>Threat trends — detailed table (optional)</summary>
+    <div class="bundle-inner">
+  <table class="bix">
+    <thead><tr><th>Threat</th><th>Priority</th><th>Trend</th><th>Incidents</th><th>Reported $ (corpus)</th><th>Potential financial risk</th><th>Publications</th><th>Advisories</th><th>Updated</th></tr></thead>
+    <tbody id="trend-tbody"><tr><td colspan="9">Loading…</td></tr></tbody>
+  </table>
+    </div>
+  </details>
+
+  <h2 class="sec dash-sec" id="org-wizard">What Applies To My Organization?</h2>
+  <div class="wiz-panel">
+    <p class="sector-hint" id="wiz-intro-note">Select the <strong>data types</strong> your organization handles. <strong>Click any threat row</strong> to open authoritative source links.</p>
+    <div class="wiz-checks">
+      <label><input type="checkbox" class="wiz-data" value="pii"> PII (personally identifiable information)</label>
+      <label><input type="checkbox" class="wiz-data" value="phi"> PHI (protected health information)</label>
+      <label><input type="checkbox" class="wiz-data" value="ip"> IP / source code</label>
+    </div>
+    <button type="button" id="btn-wizard" style="margin-top:10px;background:var(--navy);color:#fff;border:none;padding:8px 14px;border-radius:4px;font-weight:700;cursor:pointer">Generate profile</button>
+    <div id="wizard-results" style="margin-top:14px"></div>
+  </div>
+
+  <h2 class="sec dash-sec" id="awareness-center">Executive Awareness &amp; US Governance Decisions</h2>
+  <div id="awareness-content"><p>Loading governance playbook…</p></div>
+
+    </div>
+  </details>
+</div>
+
+</div>
+</div>
+</body>
+</html>
